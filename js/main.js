@@ -293,10 +293,18 @@
     if (!ctx) return;
 
     var flakes = [];
+    var lights = [];
     var width, height;
+    var time = 0;
+
+    var LIGHT_COLORS = ["232,162,74", "159,195,217"];
 
     function count() {
       return window.innerWidth < 768 ? 60 : 120;
+    }
+
+    function lightCount() {
+      return window.innerWidth < 768 ? 10 : 18;
     }
 
     function resize() {
@@ -308,10 +316,23 @@
       return {
         x: Math.random() * width,
         y: Math.random() * height,
-        r: Math.random() * 2 + 0.6,
+        r: Math.random() * 2.8 + 1,
         speed: Math.random() * 0.6 + 0.25,
         drift: Math.random() * 0.4 - 0.2,
         opacity: Math.random() * 0.5 + 0.3
+      };
+    }
+
+    function makeLight() {
+      return {
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 0.7 + 0.3,
+        speed: Math.random() * 0.35 + 0.15,
+        drift: Math.random() * 0.3 - 0.15,
+        color: LIGHT_COLORS[Math.floor(Math.random() * LIGHT_COLORS.length)],
+        phase: Math.random() * Math.PI * 2,
+        twinkleSpeed: Math.random() * 0.02 + 0.015
       };
     }
 
@@ -322,10 +343,18 @@
       for (var i = 0; i < n; i++) {
         flakes.push(makeFlake());
       }
+      var m = lightCount();
+      lights = [];
+      for (var j = 0; j < m; j++) {
+        lights.push(makeLight());
+      }
     }
 
     function step() {
+      time++;
       ctx.clearRect(0, 0, width, height);
+
+      ctx.shadowBlur = 0;
       ctx.fillStyle = "rgba(233,237,242,0.85)";
       for (var i = 0; i < flakes.length; i++) {
         var f = flakes[i];
@@ -343,6 +372,29 @@
         ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
         ctx.fill();
       }
+
+      for (var k = 0; k < lights.length; k++) {
+        var l = lights[k];
+        l.y += l.speed;
+        l.x += l.drift;
+        if (l.y > height) {
+          l.y = -4;
+          l.x = Math.random() * width;
+        }
+        if (l.x > width) l.x = 0;
+        if (l.x < 0) l.x = width;
+
+        var twinkle = 0.4 + 0.6 * Math.abs(Math.sin(time * l.twinkleSpeed + l.phase));
+        ctx.globalAlpha = twinkle;
+        ctx.fillStyle = "rgba(" + l.color + ",1)";
+        ctx.shadowColor = "rgba(" + l.color + ",0.9)";
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.arc(l.x, l.y, l.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
       window.requestAnimationFrame(step);
     }
