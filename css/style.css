@@ -77,6 +77,7 @@ section{
 
 .hero{
   position: relative;
+  z-index: 0;
   min-height: 100svh;
   min-height: 100vh;
   display: flex;
@@ -84,6 +85,46 @@ section{
   justify-content: center;
   overflow: hidden;
   background: linear-gradient(180deg, #060810 0%, #0b0e14 55%, #0d1220 100%);
+}
+
+.hero__poster{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.hero__poster img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: hero-poster-zoom 26s ease-in-out infinite alternate;
+}
+
+.hero__poster-glow{
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 30% at 50% 22%, rgba(232,162,74,0.22), transparent 65%);
+  animation: hero-poster-glow 7s ease-in-out infinite;
+}
+
+@keyframes hero-poster-zoom{
+  from{ transform: scale(1); }
+  to{ transform: scale(1.08); }
+}
+
+@keyframes hero-poster-glow{
+  0%, 100%{ opacity: .35; }
+  50%{ opacity: .8; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .hero__poster img,
+  .hero__poster-glow{
+    animation: none;
+  }
 }
 
 .hero__video{
