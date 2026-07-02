@@ -34,7 +34,77 @@
   function attachImageFallback(img, placeholder) {
     img.addEventListener("error", function () {
       img.hidden = true;
+      img.dataset.broken = "true";
       if (placeholder) placeholder.hidden = false;
+    });
+  }
+
+  /* ---------------------------------------------------------
+     SCENEカード: タップで動画に切り替え(reduced motion時は無効)
+     --------------------------------------------------------- */
+  function setupSceneVideoToggle(media, img, placeholder, videoSrc) {
+    if (reduceMotion) return;
+
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "scene-card__play";
+    button.setAttribute("aria-label", "動画を再生");
+
+    var icon = document.createElement("span");
+    icon.className = "scene-card__play-icon";
+    icon.setAttribute("aria-hidden", "true");
+    button.appendChild(icon);
+    media.appendChild(button);
+
+    var video = null;
+    var playing = false;
+
+    function showStill() {
+      if (video) {
+        video.pause();
+        video.hidden = true;
+      }
+      if (img.dataset.broken !== "true") {
+        img.hidden = false;
+      } else if (placeholder) {
+        placeholder.hidden = false;
+      }
+      playing = false;
+      button.classList.remove("is-playing");
+      button.setAttribute("aria-label", "動画を再生");
+    }
+
+    function showVideo() {
+      if (!video) {
+        video = document.createElement("video");
+        video.className = "scene-card__video";
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.setAttribute("playsinline", "");
+        video.setAttribute("aria-hidden", "true");
+        video.src = videoSrc;
+        video.addEventListener("error", showStill);
+        media.insertBefore(video, button);
+      }
+      img.hidden = true;
+      if (placeholder) placeholder.hidden = true;
+      video.hidden = false;
+      var playPromise = video.play();
+      if (playPromise && playPromise.catch) {
+        playPromise.catch(function () {});
+      }
+      playing = true;
+      button.classList.add("is-playing");
+      button.setAttribute("aria-label", "画像に戻す");
+    }
+
+    button.addEventListener("click", function () {
+      if (playing) {
+        showStill();
+      } else {
+        showVideo();
+      }
     });
   }
 
@@ -71,6 +141,10 @@
 
       media.appendChild(img);
       media.appendChild(placeholder);
+
+      if (scene.video) {
+        setupSceneVideoToggle(media, img, placeholder, scene.video);
+      }
 
       var body = document.createElement("div");
       body.className = "scene-card__body";
@@ -168,6 +242,47 @@
   }
 
   /* ---------------------------------------------------------
+     HERO背景動画: 読み込み失敗でCSS背景にフォールバック、
+     reduced motion時は静止画(poster)のまま止める
+     --------------------------------------------------------- */
+  function setupHeroVideo() {
+    var video = document.getElementById("heroVideo");
+    if (!video) return;
+
+    function fallbackToBackground() {
+      video.hidden = true;
+    }
+
+    video.addEventListener("error", fallbackToBackground);
+    var source = video.querySelector("source");
+    if (source) {
+      source.addEventListener("error", fallbackToBackground);
+    }
+    video.addEventListener("stalled", function () {
+      if (video.networkState === video.NETWORK_NO_SOURCE) {
+        fallbackToBackground();
+      }
+    });
+    window.setTimeout(function () {
+      if (video.networkState === video.NETWORK_NO_SOURCE) {
+        fallbackToBackground();
+      }
+    }, 2000);
+
+    if (reduceMotion) {
+      video.removeAttribute("autoplay");
+      video.pause();
+      return;
+    }
+
+    video.muted = true;
+    var playPromise = video.play();
+    if (playPromise && playPromise.catch) {
+      playPromise.catch(function () {});
+    }
+  }
+
+  /* ---------------------------------------------------------
      降雪キャンバス
      --------------------------------------------------------- */
   function setupSnow() {
@@ -246,6 +361,7 @@
      初期化
      --------------------------------------------------------- */
   document.addEventListener("DOMContentLoaded", function () {
+    setupHeroVideo();
     setupSnow();
     setupFutari();
 
