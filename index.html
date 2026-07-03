@@ -35,13 +35,14 @@
   <canvas class="hero__snow" id="snowCanvas" aria-hidden="true"></canvas>
   <div class="hero__content">
     <h1 class="hero__title visually-hidden">日消ゆる国</h1>
+    <span class="hero__chapter" aria-hidden="true">序</span>
     <p class="hero__copy">二つの陽が昇っても、<br>この国の夜は、まだ終わらない。</p>
     <p class="hero__scroll">▼ SCENE</p>
   </div>
 </section>
 
 <section class="kotoba" aria-label="ことば">
-  <p class="kotoba__lines">
+  <p class="kotoba__lines reveal-stagger">
     <span>二つの陽が昇っても、</span>
     <span>この国の夜は、まだ終わらない。</span>
     <span>それでも人は、</span>
@@ -50,20 +51,26 @@
 </section>
 
 <section class="scenes" aria-labelledby="scenes-heading">
-  <h2 class="section-heading" id="scenes-heading">情景</h2>
+  <div class="section-heading-group reveal">
+    <span class="seal" aria-hidden="true">弐</span>
+    <h2 class="section-heading" id="scenes-heading">情景</h2>
+  </div>
   <ul class="scene-list" id="sceneList"></ul>
 </section>
 
 <section class="futari" aria-labelledby="futari-heading">
-  <h2 class="section-heading" id="futari-heading">旅の二人</h2>
-  <div class="futari__media" id="futariMedia">
+  <div class="section-heading-group reveal">
+    <span class="seal" aria-hidden="true">参</span>
+    <h2 class="section-heading" id="futari-heading">旅の二人</h2>
+  </div>
+  <div class="futari__media reveal" id="futariMedia">
     <img src="assets/img/futari.webp" alt="この国のどこかを歩く二人の後ろ姿" id="futariImg">
     <div class="futari__placeholder" id="futariPlaceholder" hidden aria-hidden="true">
       <div class="futari__silhouette"></div>
       <div class="futari__silhouette"></div>
     </div>
   </div>
-  <p class="futari__text">
+  <p class="futari__text reveal-stagger">
     <span>この国のどこかを、二人が歩いている。</span>
     <span>一方は黙って歩き、一方はよく喋る。</span>
     <span>何者かは、まだ言えない。</span>
@@ -71,18 +78,21 @@
 </section>
 
 <section class="omake" aria-label="おまけ">
-  <a class="omake__card" href="hiyuru.html">ゆるい方もあります。<span>→ 日ゆる</span></a>
+  <a class="omake__card reveal" href="hiyuru.html">ゆるい方もあります。<span>→ 日ゆる</span></a>
 </section>
 
 <section class="tadoru" aria-labelledby="tadoru-heading">
-  <h2 class="section-heading" id="tadoru-heading">たどる</h2>
-  <div class="tadoru__links">
+  <div class="section-heading-group reveal">
+    <span class="seal" aria-hidden="true">四</span>
+    <h2 class="section-heading" id="tadoru-heading">たどる</h2>
+  </div>
+  <div class="tadoru__links reveal">
     <!-- ここをX(旧Twitter)の公式アカウントURLに差し替え -->
     <a href="#" target="_blank" rel="noopener">X</a>
     <!-- ここをnoteの公式アカウントURLに差し替え -->
     <a href="#" target="_blank" rel="noopener">note</a>
   </div>
-  <p class="tadoru__tags">#日消ゆる国 #日ゆる</p>
+  <p class="tadoru__tags reveal">#日消ゆる国 #日ゆる</p>
 </section>
 
 </main>

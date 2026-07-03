@@ -32,11 +32,20 @@
   }
 
   function attachImageFallback(img, placeholder) {
-    img.addEventListener("error", function () {
+    function markBroken() {
       img.hidden = true;
       img.dataset.broken = "true";
       if (placeholder) placeholder.hidden = false;
-    });
+    }
+
+    // 静的<img>は解析と同時に読み込みが始まるため、リスナー登録前に
+    // 失敗が完了している場合がある(特にsrcが即404するケース)。
+    if (img.getAttribute("src") && img.complete && img.naturalWidth === 0) {
+      markBroken();
+      return;
+    }
+
+    img.addEventListener("error", markBroken);
   }
 
   /* ---------------------------------------------------------
@@ -126,6 +135,12 @@
       var media = document.createElement("div");
       media.className = "scene-card__media";
 
+      var watermark = document.createElement("span");
+      watermark.className = "scene-card__watermark";
+      watermark.setAttribute("aria-hidden", "true");
+      watermark.textContent = scene.no;
+      media.appendChild(watermark);
+
       var img = document.createElement("img");
       img.src = scene.src;
       img.alt = scene.title + "(" + scene.place + ")";
@@ -187,6 +202,37 @@
 
     cards.forEach(function (card) {
       observer.observe(card);
+    });
+  }
+
+  /* ---------------------------------------------------------
+     スクロール出現(見出し・ことば・旅の二人・たどる等の汎用演出)
+     --------------------------------------------------------- */
+  function observeReveal() {
+    var targets = document.querySelectorAll(".reveal, .reveal-stagger");
+    if (!targets.length) return;
+
+    if (reduceMotion || typeof IntersectionObserver !== "function") {
+      targets.forEach(function (el) {
+        el.classList.add("is-visible");
+      });
+      return;
+    }
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    targets.forEach(function (el) {
+      observer.observe(el);
     });
   }
 
@@ -416,6 +462,7 @@
     setupHeroVideo();
     setupSnow();
     setupFutari();
+    observeReveal();
 
     if (document.getElementById("sceneList")) {
       fetchJson("data/scenes.json", SCENES_FALLBACK).then(renderScenes);
